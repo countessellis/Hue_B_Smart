@@ -268,8 +268,9 @@ def parse(String description) {
 		def headerString = parsedEvent.headers.toString()
 		if (headerString.contains("application/json")) {
 			def body = new groovy.json.JsonSlurper().parseText(parsedEvent.body)
+			log.debug "${body}"
 			def bridge = parent.getBridge(parsedEvent.mac)
-            def group 
+            		def group 
 			def commandReturn = []
             
 			/* responses from bulb/group/scene/schedule command. Figure out which device it is, then pass it along to the device. */
@@ -278,7 +279,7 @@ def parse(String description) {
 				body.each{
 					it.success.each { k, v ->
 						def spl = k.split("/")
-						//log.debug "k = ${k}, split1 = ${spl[1]}, split2 = ${spl[2]}, split3 = ${spl[3]}, split4= ${spl[4]}, value = ${v}"                            
+						log.debug "k = ${k}, split1 = ${spl[1]}, split2 = ${spl[2]}, split3 = ${spl[3]}, split4= ${spl[4]}, value = ${v}"                            
 						def devId = ""
                         def d
                         def groupScene
@@ -316,7 +317,7 @@ def parse(String description) {
                     	// GROUPS
 						} else if (spl[1] == "groups" && spl[2] != 0 ) {    
             	        	devId = bridge.value.mac + "/" + spl[1].toUpperCase()[0..-2] + spl[2]
-        	    	        //log.debug "GROUP: devId = ${devId}"                            
+        	    	        log.debug "GROUP: devId = ${devId}"                            
 	
 							d = parent.getChildDevice(devId)
 
