@@ -1076,80 +1076,6 @@ def enableQF(params) {
 	}
 }
 
-
-/**
-def deleteQuickfixSch(params) {
-    state.selectedScene = []
-	state.selectedGroup = []
-    state.availableGroups = []
-	state.availableScenes = []
-    
-    if (params.mac) {
-        state.params = params;
-    } else {
-        params = state.params;
-    }
-
-    def errorText = ""
-
-	def bridge = getBridge(params.mac)
-	def addedGroups = [:]
-    def availableGroups = [:]
-	def addedScenes = [:]
-    def availableScenes = [:]
-
-	def user = state.user
-    log.debug "=================== ${state.user} ================"
-    bridge.value.groups.each {
-		def groupsDevId = "${params.mac}/GROUP${it.key}"
-		def groupName = it.value.name
-        
-		def d = getChildDevice(groupDevId) 
-        if (d) {
-        	addedGroups << it
-        } else {
-        	availableGroups << it
-        }
-    }
-    
-    bridge.value.scenes.each {
-		def scenesDevId = "${params.mac}/SCENE${it.key}"
-		def sceneName = it.value.name
-        
-		def e = getChildDevice(scenesDevId) 
-        if (e) {
-        	addedScenes << it
-        } else {
-        	availableGroups << it
-        }
-    }
-
-	
-    
-    if (params.remove) {
-    	log.debug "Removing ${params.remove}"
-		def devId = params.remove
-        params.remove = null
-		def groupId = devId.split("GROUP")[1]
-		try {
-        	deleteChildDevice(devId)
-            addedGroups.remove(groupId)
-            availableGroups[groupId] = bridge.value.groups[groupId]
-		} catch (physicalgraph.exception.NotFoundException e) {
-        	log.debug("${devId} already deleted.")
-            addedGroups.remove(groupId)
-            availableGroups[groupId] = bridge.value.groups[groupId]
-		} catch (physicalgraph.exception.ConflictException e) {
-        	log.debug("${devId} still in use.")
-            errorText = "Group ${bridge.value.groups[groupId].name} is still in use. Remove from any SmartApps or Dashboards, then try again."
-        }
-    }
-
-
-
-}
-**/
-
 def installed() {
     log.debug "Installed with settings: ${settings}"
     initialize()
@@ -1385,6 +1311,7 @@ private verifyHueBridges() {
     }
 }
 
+/*
 private verifyHueBridge(String deviceNetworkId, String host) {
     log.debug("Sending verify request for ${deviceNetworkId} (${host})")
     sendHubCommand(new physicalgraph.device.HubAction([
@@ -1393,6 +1320,17 @@ private verifyHueBridge(String deviceNetworkId, String host) {
             headers: [
                     HOST: host
             ]]))
+}
+*/
+
+private verifyHueBridge(String deviceNetworkId, String host) {
+	log.trace "Verify Hue Bridge $deviceNetworkId"
+	sendHubCommand(new physicalgraph.device.HubAction([
+		method: "GET",
+		path: "/description.xml",
+		headers: [
+			HOST: host
+		]], deviceNetworkId, [callback: "processVerifyResponse"]))
 }
 
 /**
