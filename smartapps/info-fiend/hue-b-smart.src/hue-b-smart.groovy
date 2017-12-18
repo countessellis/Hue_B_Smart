@@ -1331,7 +1331,7 @@ private verifyHueBridge(String deviceNetworkId, String host) {
 		path: "/description.xml",
 		headers: [
 			HOST: host
-		]]))
+		]],[callback: "locationHandler"]))
 }
 
 /**
