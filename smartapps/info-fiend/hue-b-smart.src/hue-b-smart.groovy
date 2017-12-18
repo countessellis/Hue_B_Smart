@@ -158,6 +158,7 @@ def linkButton(params) {
     if (!params.linkDone) {
         if ((linkRefreshcount % 2) == 0) {
             sendDeveloperReq("${params.ip}:80", params.mac)
+	 	log.debug("Send Developer Request")
         }
         log.debug "linkButton ${params}"
         dynamicPage(name: "linkButton", refreshInterval: refreshInterval, nextPage: "linkButton") {
@@ -1384,7 +1385,7 @@ private sendDeveloperReq(ip, mac) {
             headers: [
                     HOST: ip
             ],
-            body: [devicetype: "$token-0"]]))
+            body: [devicetype: "$token-0"]],[callback: "Hubinstall"]))
 }
 
 /**
