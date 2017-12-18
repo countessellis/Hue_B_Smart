@@ -1233,23 +1233,29 @@ def itemDiscoveryHandler(evt) {
 def locationHandler(evt) {
     def description = evt.description
     def hub = evt?.hubId
+	log.trace "Location: $description"
 
     def parsedEvent = parseLanMessage(description)
     parsedEvent << ["hub":hub]
 
     if (parsedEvent?.ssdpTerm?.contains("urn:schemas-upnp-org:device:basic:1")) {
         /* SSDP response */
+	log.trace "SSDP DISCOVERY EVENTS"
         processDiscoveryResponse(parsedEvent)
     } else if (parsedEvent.headers && parsedEvent.body) {
         /* Hue bridge HTTP reply */
+	    log.trace "HUE BRIDGE RESPONSES"
         def headerString = parsedEvent.headers.toString()
         if (headerString.contains("xml")) {
             /* description.xml reply, verifying bridge */
+		log.trace "description.xml response (application/xml)"
             processVerifyResponse(parsedEvent.body)
         } else if (headerString?.contains("json")) {
+		log.trace "description.xml response (application/json)"
             def body = new groovy.json.JsonSlurper().parseText(parsedEvent.body)
             if (body.success != null && body.success[0] != null && body.success[0].username) {
                 /* got username from bridge */
+		   log.trace "got username from bridge"
                 state.params.linkDone = true
                 state.params.username = body.success[0].username
             } else if (body.error && body.error[0] && body.error[0].description) {
@@ -1331,7 +1337,7 @@ private verifyHueBridge(String deviceNetworkId, String host) {
 		path: "/description.xml",
 		headers: [
 			HOST: host
-		]],[callback: "processVerifyResponse"]))
+		]],[callback: "processDiscoveryResponse"]))
 }
 
 /**
