@@ -1331,7 +1331,7 @@ private verifyHueBridge(String deviceNetworkId, String host) {
 		path: "/description.xml",
 		headers: [
 			HOST: host
-		]],[callback: "locationHandler"]))
+		]],[callback: "processVerifyResponse"]))
 }
 
 /**
@@ -1362,10 +1362,11 @@ private processDiscoveryResponse(parsedEvent) {
 }
 
 private processVerifyResponse(eventBody) {
-    log.debug("Processing verify response.")
+    log.debug("Processing verify response processVerifyResponse")
     def body = new XmlSlurper().parseText(eventBody)
     if (body?.device?.modelName?.text().startsWith("Philips hue bridge")) {
         log.debug(body?.device?.UDN?.text())
+	log.debug("body result")
         def bridge = getUnlinkedBridges().find({it?.key?.contains(body?.device?.UDN?.text())})
         if (bridge) {
             log.debug("found bridge!")
