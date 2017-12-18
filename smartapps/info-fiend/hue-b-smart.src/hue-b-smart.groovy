@@ -143,7 +143,7 @@ def linkButton(params) {
     /* if the user hit the back button, use saved parameters as the passed ones no longer good
      * also uses state.params to pass these on to the next page
      */
-
+ log.debug("Link Button Page")
     if (params.mac) {
         state.params = params;
     } else {
